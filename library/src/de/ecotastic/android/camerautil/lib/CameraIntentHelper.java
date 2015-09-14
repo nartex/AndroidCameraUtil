@@ -1,7 +1,9 @@
 package de.ecotastic.android.camerautil.lib;
 
 import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -52,10 +54,16 @@ public class CameraIntentHelper {
 
 	private final CameraIntentHelperCallback mCameraIntentHelperCallback;
 	public Activity mActivity;
+	public Fragment mFragment;
 
 
 	public CameraIntentHelper(Activity activity, CameraIntentHelperCallback cameraIntentHelperCallback) {
 		mActivity = activity;
+		mCameraIntentHelperCallback = cameraIntentHelperCallback;
+	}
+
+	public CameraIntentHelper(Fragment fragment, CameraIntentHelperCallback cameraIntentHelperCallback) {
+		mFragment = fragment;
 		mCameraIntentHelperCallback = cameraIntentHelperCallback;
 	}
 
@@ -180,12 +188,12 @@ public class CameraIntentHelper {
 					String filename = System.currentTimeMillis() + ".jpg";
 					ContentValues values = new ContentValues();
 					values.put(MediaStore.Images.Media.TITLE, filename);
-					preDefinedCameraUri = mActivity.getContentResolver().insert(
+					preDefinedCameraUri = getContentResolver().insert(
 												MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 												values);
 					intent.putExtra(MediaStore.EXTRA_OUTPUT, preDefinedCameraUri);
-				}				
-				mActivity.startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+				}
+				startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 			} catch (ActivityNotFoundException e) {
 				if (mCameraIntentHelperCallback != null) {
 					mCameraIntentHelperCallback.logException(e);
@@ -209,7 +217,23 @@ public class CameraIntentHelper {
 			}
 		}
 	}
-	
+
+	private void startActivityForResult(Intent intent, int requestCode){
+		if (mActivity != null){
+			mActivity.startActivityForResult(intent, requestCode);
+		}else if (mFragment != null){
+			mFragment.startActivityForResult(intent, requestCode);
+		}
+	}
+
+	private ContentResolver getContentResolver(){
+		if (mActivity != null){
+			return mActivity.getContentResolver();
+		}else if (mFragment != null){
+			return mFragment.getActivity().getContentResolver();
+		}
+		return null;
+	}
 	
 	/**
 	 * On camera activity result, we try to locate the photo.
@@ -244,7 +268,7 @@ public class CameraIntentHelper {
 												MediaStore.Images.ImageColumns.ORIENTATION,
 												MediaStore.Images.ImageColumns.DATE_TAKEN };
 				String largeFileSort = MediaStore.Images.ImageColumns._ID + " DESC";
-				myCursor = mActivity.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+				myCursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 														largeFileProjection, 
 														null, null, 
 														largeFileSort);
@@ -387,7 +411,7 @@ public class CameraIntentHelper {
 			if (cameraPicUri != null
 					&& cameraPicUri.toString().startsWith("content")) {
 				String[] proj = { MediaStore.Images.Media.DATA };
-				cursor = mActivity.getContentResolver().query(cameraPicUri, proj, null, null, null);
+				cursor = getContentResolver().query(cameraPicUri, proj, null, null, null);
 				cursor.moveToFirst();
 				// This will actually give you the file path location of the image.
 				String largeImagePath = cursor.getString(cursor
