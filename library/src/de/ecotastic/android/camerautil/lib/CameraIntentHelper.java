@@ -1,7 +1,6 @@
 package de.ecotastic.android.camerautil.lib;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -11,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 
 import java.io.File;
 import java.util.Date;
@@ -218,7 +218,7 @@ public class CameraIntentHelper {
 		}
 	}
 
-	private void startActivityForResult(Intent intent, int requestCode){
+	public void startActivityForResult(Intent intent, int requestCode){
 		if (mActivity != null){
 			mActivity.startActivityForResult(intent, requestCode);
 		}else if (mFragment != null){
@@ -226,7 +226,7 @@ public class CameraIntentHelper {
 		}
 	}
 
-	private ContentResolver getContentResolver(){
+	public ContentResolver getContentResolver(){
 		if (mActivity != null){
 			return mActivity.getContentResolver();
 		}else if (mFragment != null){

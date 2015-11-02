@@ -40,3 +40,4 @@ proguard/
 *.settings
 .arc/
 out/
+.DS_Store

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="androidCameraUtil_chooseSource">Source</string>
+    <string name="androidCameraUtil_camera">Camera</string>
+    <string name="androidCameraUtil_gallery">Gallery</string>
+</resources>
